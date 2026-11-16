@@ -1,0 +1,18 @@
+{
+  "name": "booknest",
+  "version": "1.0.0",
+  "description": "BookNest – Online Bookstore Management System",
+  "scripts": {
+    "start:backend": "cd backend && npm start",
+    "start:frontend": "cd frontend && npm run dev",
+    "build:frontend": "cd frontend && npm run build"
+  },
+  "keywords": [
+    "bookstore",
+    "management",
+    "mern",
+    "college-project"
+  ],
+  "author": "Engineering Student",
+  "license": "ISC"
+}
