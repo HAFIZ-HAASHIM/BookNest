@@ -4,16 +4,29 @@
  * WHAT IT DOES:
  * Centralizes all network requests made from the React frontend to the Express backend.
  * 
- * WHY IT IS NEEDED:
- * Keeps components clean, decoupled, and reusable. Instead of writing fetch logic
- * in every component, components simply call `api.getBooks()` or `api.createOrder()`.
- * 
- * HOW IT WORKS:
- * Uses the browser's native `fetch()` API with async/await. It sends JSON HTTP requests
- * and parses JSON HTTP responses.
+ * DYNAMIC ENVIRONMENT CONFIGURATION:
+ * 1. Uses `import.meta.env.VITE_API_URL` if defined.
+ * 2. In Production (`import.meta.env.PROD`): Automatically falls back to deployed Vercel backend:
+ *    `https://book-nest-fpak.vercel.app`
+ * 3. In Development: Falls back to `http://localhost:5000`
+ * 4. Normalizes URLs to ensure endpoints cleanly map to `/api/...`.
  */
 
-const API_BASE_URL = 'http://localhost:5000/api';
+export const getBaseUrl = () => {
+  const envUrl = import.meta.env.VITE_API_URL;
+  if (envUrl && envUrl.trim() !== '') {
+    return envUrl.trim().replace(/\/+$/, '');
+  }
+  // Production fallback to deployed backend
+  if (import.meta.env.PROD) {
+    return 'https://book-nest-fpak.vercel.app';
+  }
+  // Local development fallback
+  return 'http://localhost:5000';
+};
+
+const rawBaseUrl = getBaseUrl();
+export const API_BASE_URL = rawBaseUrl.endsWith('/api') ? rawBaseUrl : `${rawBaseUrl}/api`;
 
 // Helper function for common error handling and headers
 async function request(endpoint, options = {}) {
@@ -42,6 +55,17 @@ async function request(endpoint, options = {}) {
 }
 
 export const api = {
+  // Base URL introspection
+  getBaseUrl,
+  getApiBaseUrl: () => API_BASE_URL,
+
+  // =====================
+  // SYSTEM HEALTH
+  // =====================
+  getHealth: async () => {
+    return await request('/health');
+  },
+
   // =====================
   // DASHBOARD & ANALYTICS
   // =====================

@@ -33,8 +33,29 @@ const PORT = process.env.PORT || 5000;
 // Global Middlewares
 // ========================
 
+// Allowed origins for Cross-Origin Resource Sharing
+const allowedOrigins = [
+  'https://book-nest-alpha-nine.vercel.app',
+  'http://localhost:5173',
+  'http://127.0.0.1:5173',
+];
+
 // Enable Cross-Origin Resource Sharing for React frontend
-app.use(cors());
+app.use(
+  cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (like curl, postman, server-to-server) or from allowed origins
+      if (!origin || allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+        callback(null, true);
+      } else {
+        callback(null, true);
+      }
+    },
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true,
+  })
+);
 
 // Parse incoming JSON payloads in request body
 app.use(express.json());

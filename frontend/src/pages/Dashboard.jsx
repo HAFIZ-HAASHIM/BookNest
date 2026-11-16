@@ -30,12 +30,14 @@ export default function Dashboard({ setActiveTab, onOpenAddBook, onOpenNewOrder 
   const loadDashboardData = async () => {
     try {
       setLoading(true);
+      setError('');
       const res = await api.getDashboardStats();
       if (res.success) {
         setStats(res.data);
       }
     } catch (err) {
-      setError('Failed to connect to backend server. Make sure backend is running on port 5000.');
+      const details = err.message || 'Unable to connect to backend server.';
+      setError(`Backend Communication Error: ${details}`);
     } finally {
       setLoading(false);
     }
@@ -53,7 +55,10 @@ export default function Dashboard({ setActiveTab, onOpenAddBook, onOpenNewOrder 
     return (
       <div className="card" style={{ padding: '24px', borderLeft: '4px solid #dc2626' }}>
         <h3 style={{ color: '#dc2626', marginBottom: '8px' }}>Connection Error</h3>
-        <p style={{ color: '#475569', marginBottom: '16px' }}>{error}</p>
+        <p style={{ color: '#475569', marginBottom: '8px' }}>{error}</p>
+        <p style={{ fontSize: '0.82rem', color: '#64748b', marginBottom: '16px' }}>
+          Target Backend: <code style={{ backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>{api.getApiBaseUrl()}</code>
+        </p>
         <button className="btn btn-primary btn-sm" onClick={loadDashboardData}>
           Retry Connection
         </button>
