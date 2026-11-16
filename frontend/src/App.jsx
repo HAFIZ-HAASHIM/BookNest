@@ -16,6 +16,7 @@
 import React, { useState, useEffect } from 'react';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
+import BottomNav from './components/BottomNav';
 import Dashboard from './pages/Dashboard';
 import Books from './pages/Books';
 import Inventory from './pages/Inventory';
@@ -31,6 +32,7 @@ import './App.css';
 export default function App() {
   // Navigation State
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   // Shared Book List (for modals and lookups)
   const [availableBooks, setAvailableBooks] = useState([]);
@@ -165,8 +167,13 @@ export default function App() {
 
   return (
     <div className="app-container">
-      {/* Sidebar Navigation */}
-      <Sidebar activeTab={activeTab} setActiveTab={setActiveTab} />
+      {/* Sidebar Navigation (Desktop fixed + Mobile slide-out drawer) */}
+      <Sidebar
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
+        isOpen={isMobileNavOpen}
+        onClose={() => setIsMobileNavOpen(false)}
+      />
 
       {/* Main Content Area */}
       <div className="main-wrapper">
@@ -175,6 +182,7 @@ export default function App() {
           onResetDemo={handleResetDemo}
           onOpenAddBook={handleOpenAddBook}
           onOpenNewOrder={handleOpenNewOrder}
+          onToggleMobileNav={() => setIsMobileNavOpen((prev) => !prev)}
         />
 
         <main className="content-area">
@@ -220,6 +228,9 @@ export default function App() {
           )}
         </main>
       </div>
+
+      {/* Mobile Fixed Bottom Navigation Bar */}
+      <BottomNav activeTab={activeTab} setActiveTab={setActiveTab} />
 
       {/* Modals */}
       <BookModal

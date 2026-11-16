@@ -96,78 +96,139 @@ export default function Orders({ onOpenNewOrder, refreshTrigger, showToast }) {
         {loading ? (
           <div className="loading-spinner">Loading customer order history...</div>
         ) : (
-          <div className="table-responsive">
-            <table className="custom-table">
-              <thead>
-                <tr>
-                  <th>Order ID</th>
-                  <th>Date & Time</th>
-                  <th>Customer Name</th>
-                  <th>Contact</th>
-                  <th>Book Purchased</th>
-                  <th>Qty</th>
-                  <th>Unit Price</th>
-                  <th>Total Price</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                {orders.length > 0 ? (
-                  orders.map((order) => {
-                    const formattedDate = new Date(order.createdAt).toLocaleString(undefined, {
-                      year: 'numeric',
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit',
-                    });
-
-                    return (
-                      <tr key={order._id}>
-                        <td style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#64748b' }}>
-                          #{order._id.slice(-6).toUpperCase()}
-                        </td>
-                        <td style={{ fontSize: '0.82rem', color: '#64748b', whiteSpace: 'nowrap' }}>
-                          {formattedDate}
-                        </td>
-                        <td style={{ fontWeight: 600 }}>{order.customerName}</td>
-                        <td style={{ fontSize: '0.82rem', color: '#475569' }}>
-                          {order.customerEmail || order.customerPhone || '—'}
-                        </td>
-                        <td>
-                          <div style={{ fontWeight: 500 }}>{order.bookTitle}</div>
-                        </td>
-                        <td style={{ fontWeight: 600 }}>{order.quantity}</td>
-                        <td>${order.unitPrice.toFixed(2)}</td>
-                        <td style={{ fontWeight: 700, color: 'var(--primary)' }}>
-                          ${order.totalPrice.toFixed(2)}
-                        </td>
-                        <td>
-                          <span className="badge badge-order-completed">
-                            {order.status || 'Completed'}
-                          </span>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
+          <>
+            {/* Desktop Table View */}
+            <div className="table-responsive desktop-only-view">
+              <table className="custom-table">
+                <thead>
                   <tr>
-                    <td colSpan="9" className="empty-state">
-                      <div className="empty-icon">🛒</div>
-                      <p>No customer orders recorded yet.</p>
-                      <button
-                        className="btn btn-primary btn-sm"
-                        style={{ marginTop: '12px' }}
-                        onClick={onOpenNewOrder}
-                      >
-                        Create First Order
-                      </button>
-                    </td>
+                    <th>Order ID</th>
+                    <th>Date & Time</th>
+                    <th>Customer Name</th>
+                    <th>Contact</th>
+                    <th>Book Purchased</th>
+                    <th>Qty</th>
+                    <th>Unit Price</th>
+                    <th>Total Price</th>
+                    <th>Status</th>
                   </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {orders.length > 0 ? (
+                    orders.map((order) => {
+                      const formattedDate = new Date(order.createdAt).toLocaleString(undefined, {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                      });
+
+                      return (
+                        <tr key={order._id}>
+                          <td style={{ fontFamily: 'monospace', fontSize: '0.78rem', color: '#64748b' }}>
+                            #{order._id.slice(-6).toUpperCase()}
+                          </td>
+                          <td style={{ fontSize: '0.82rem', color: '#64748b', whiteSpace: 'nowrap' }}>
+                            {formattedDate}
+                          </td>
+                          <td style={{ fontWeight: 600 }}>{order.customerName}</td>
+                          <td style={{ fontSize: '0.82rem', color: '#475569' }}>
+                            {order.customerEmail || order.customerPhone || '—'}
+                          </td>
+                          <td>
+                            <div style={{ fontWeight: 500 }}>{order.bookTitle}</div>
+                          </td>
+                          <td style={{ fontWeight: 600 }}>{order.quantity}</td>
+                          <td>${order.unitPrice.toFixed(2)}</td>
+                          <td style={{ fontWeight: 700, color: 'var(--primary)' }}>
+                            ${order.totalPrice.toFixed(2)}
+                          </td>
+                          <td>
+                            <span className="badge badge-order-completed">
+                              {order.status || 'Completed'}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan="9" className="empty-state">
+                        <div className="empty-icon">🛒</div>
+                        <p>No customer orders recorded yet.</p>
+                        <button
+                          className="btn btn-primary btn-sm"
+                          style={{ marginTop: '12px' }}
+                          onClick={onOpenNewOrder}
+                        >
+                          Create First Order
+                        </button>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Order Cards View */}
+            <div className="mobile-only-cards-view">
+              {orders.length > 0 ? (
+                orders.map((order) => {
+                  const formattedDate = new Date(order.createdAt).toLocaleString(undefined, {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  });
+
+                  return (
+                    <div key={order._id} className="mobile-order-card">
+                      <div className="mobile-order-header">
+                        <div>
+                          <span className="mobile-order-id">#{order._id.slice(-6).toUpperCase()}</span>
+                          <span className="mobile-order-date">{formattedDate}</span>
+                        </div>
+                        <span className="badge badge-order-completed">{order.status || 'Completed'}</span>
+                      </div>
+                      
+                      <div className="mobile-order-customer-info">
+                        <div className="mobile-order-customer-name">{order.customerName}</div>
+                        {(order.customerEmail || order.customerPhone) && (
+                          <div className="mobile-order-contact">{order.customerEmail || order.customerPhone}</div>
+                        )}
+                      </div>
+
+                      <div className="mobile-order-book-title">
+                        📖 {order.bookTitle}
+                      </div>
+
+                      <div className="mobile-order-pricing-row">
+                        <span className="mobile-order-qty-pill">
+                          {order.quantity} {order.quantity === 1 ? 'copy' : 'copies'} &times; ${order.unitPrice.toFixed(2)}
+                        </span>
+                        <span className="mobile-order-total-price">
+                          ${order.totalPrice.toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-icon">🛒</div>
+                  <p>No customer orders recorded yet.</p>
+                  <button
+                    className="btn btn-primary btn-sm"
+                    style={{ marginTop: '12px' }}
+                    onClick={onOpenNewOrder}
+                  >
+                    Create First Order
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
     </div>

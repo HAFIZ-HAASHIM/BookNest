@@ -2,15 +2,11 @@
  * Sidebar Component
  * 
  * WHAT IT DOES:
- * Provides persistent left-side navigation for the administrator.
+ * Provides persistent left-side navigation on desktop and a slide-out drawer on mobile.
  * 
  * WHY IT IS NEEDED:
  * Standard dashboard layout allowing the admin to switch between Dashboard,
  * Books, Inventory, Orders, and Sales Summary views with a single click.
- * 
- * HOW IT WORKS:
- * Receives `activeTab` and `setActiveTab` state props from `App.jsx`.
- * Updates the state when an admin clicks a menu item.
  */
 
 import React from 'react';
@@ -23,41 +19,57 @@ const navItems = [
   { id: 'sales', label: 'Sales Summary', icon: '📈' },
 ];
 
-export default function Sidebar({ activeTab, setActiveTab }) {
+export default function Sidebar({ activeTab, setActiveTab, isOpen, onClose }) {
+  const handleNavClick = (id) => {
+    setActiveTab(id);
+    if (onClose) {
+      onClose();
+    }
+  };
+
   return (
-    <aside className="sidebar">
-      {/* Brand Header */}
-      <div className="sidebar-brand">
-        <div className="brand-icon">BN</div>
-        <div className="brand-info">
-          <h1>BookNest</h1>
-          <span>Bookstore Admin</span>
-        </div>
-      </div>
+    <>
+      {/* Mobile Backdrop Overlay */}
+      {isOpen && <div className="sidebar-backdrop" onClick={onClose} />}
 
-      {/* Navigation Links */}
-      <nav className="sidebar-nav">
-        {navItems.map((item) => (
-          <button
-            key={item.id}
-            type="button"
-            className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(item.id)}
-          >
-            <span className="nav-icon">{item.icon}</span>
-            <span>{item.label}</span>
+      <aside className={`sidebar ${isOpen ? 'mobile-open' : ''}`}>
+        {/* Brand Header */}
+        <div className="sidebar-brand">
+          <div className="brand-icon">BN</div>
+          <div className="brand-info">
+            <h1>BookNest</h1>
+            <span>Bookstore Admin</span>
+          </div>
+          {/* Close button for mobile drawer */}
+          <button className="sidebar-close-btn" onClick={onClose} aria-label="Close Sidebar">
+            &times;
           </button>
-        ))}
-      </nav>
-
-      {/* Footer Info */}
-      <div className="sidebar-footer">
-        <div>System: Online</div>
-        <div className="footer-badge">
-          <span className="status-dot"></span>
-          <span>MongoDB Connected</span>
         </div>
-      </div>
-    </aside>
+
+        {/* Navigation Links */}
+        <nav className="sidebar-nav">
+          {navItems.map((item) => (
+            <button
+              key={item.id}
+              type="button"
+              className={`nav-item ${activeTab === item.id ? 'active' : ''}`}
+              onClick={() => handleNavClick(item.id)}
+            >
+              <span className="nav-icon">{item.icon}</span>
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </nav>
+
+        {/* Footer Info */}
+        <div className="sidebar-footer">
+          <div>System: Online</div>
+          <div className="footer-badge">
+            <span className="status-dot"></span>
+            <span>MongoDB Connected</span>
+          </div>
+        </div>
+      </aside>
+    </>
   );
 }

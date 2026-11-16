@@ -138,42 +138,118 @@ export default function Inventory({ onOpenStockModal, refreshTrigger, showToast 
         {loading ? (
           <div className="loading-spinner">Loading inventory status...</div>
         ) : (
-          <div className="table-responsive">
-            <table className="custom-table">
-              <thead>
-                <tr>
-                  <th>Book Title</th>
-                  <th>Category</th>
-                  <th>Unit Price</th>
-                  <th>Available Quantity</th>
-                  <th>Inventory Status</th>
-                  <th style={{ textAlign: 'right' }}>Quick Adjust</th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {books.length > 0 ? (
-                  books.map((book) => {
-                    const isOutOfStock = book.quantity <= 0;
-                    const isLowStock = book.quantity > 0 && book.quantity <= 5;
+          <>
+            {/* Desktop Table View */}
+            <div className="table-responsive desktop-only-view">
+              <table className="custom-table">
+                <thead>
+                  <tr>
+                    <th>Book Title</th>
+                    <th>Category</th>
+                    <th>Unit Price</th>
+                    <th>Available Quantity</th>
+                    <th>Inventory Status</th>
+                    <th style={{ textAlign: 'right' }}>Quick Adjust</th>
+                    <th style={{ textAlign: 'right' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {books.length > 0 ? (
+                    books.map((book) => {
+                      const isOutOfStock = book.quantity <= 0;
+                      const isLowStock = book.quantity > 0 && book.quantity <= 5;
 
-                    return (
-                      <tr key={book._id}>
-                        <td>
-                          <div style={{ fontWeight: 600 }}>{book.title}</div>
-                          <div style={{ fontSize: '0.78rem', color: '#64748b' }}>by {book.author}</div>
-                        </td>
-                        <td>
-                          <span className="badge badge-category">{book.category}</span>
-                        </td>
-                        <td style={{ fontWeight: 500 }}>${book.price.toFixed(2)}</td>
-                        <td>
-                          <span style={{ fontSize: '1.05rem', fontWeight: 700 }}>
-                            {book.quantity}
-                          </span>{' '}
-                          units
-                        </td>
-                        <td>
+                      return (
+                        <tr key={book._id}>
+                          <td>
+                            <div style={{ fontWeight: 600 }}>{book.title}</div>
+                            <div style={{ fontSize: '0.78rem', color: '#64748b' }}>by {book.author}</div>
+                          </td>
+                          <td>
+                            <span className="badge badge-category">{book.category}</span>
+                          </td>
+                          <td style={{ fontWeight: 500 }}>${book.price.toFixed(2)}</td>
+                          <td>
+                            <span style={{ fontSize: '1.05rem', fontWeight: 700 }}>
+                              {book.quantity}
+                            </span>{' '}
+                            units
+                          </td>
+                          <td>
+                            {isOutOfStock ? (
+                              <span className="badge badge-out-of-stock">Out of Stock</span>
+                            ) : isLowStock ? (
+                              <span className="badge badge-low-stock">Low Stock</span>
+                            ) : (
+                              <span className="badge badge-in-stock">In Stock</span>
+                            )}
+                          </td>
+                          <td>
+                            <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
+                              <button
+                                className="btn btn-outline btn-sm"
+                                title="Decrease quantity by 1"
+                                disabled={book.quantity <= 0}
+                                onClick={() => handleQuickAdjust(book, -1)}
+                              >
+                                - 1
+                              </button>
+                              <button
+                                className="btn btn-outline btn-sm"
+                                title="Increase quantity by 1"
+                                onClick={() => handleQuickAdjust(book, 1)}
+                              >
+                                + 1
+                              </button>
+                              <button
+                                className="btn btn-outline btn-sm"
+                                title="Increase quantity by 5"
+                                onClick={() => handleQuickAdjust(book, 5)}
+                              >
+                                + 5
+                              </button>
+                            </div>
+                          </td>
+                          <td>
+                            <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
+                              <button
+                                className="btn btn-primary btn-sm"
+                                onClick={() => onOpenStockModal(book)}
+                              >
+                                Update Stock
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan="7" className="empty-state">
+                        <div className="empty-icon">📦</div>
+                        <p>No books match this inventory filter.</p>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Cards View */}
+            <div className="mobile-only-cards-view">
+              {books.length > 0 ? (
+                books.map((book) => {
+                  const isOutOfStock = book.quantity <= 0;
+                  const isLowStock = book.quantity > 0 && book.quantity <= 5;
+
+                  return (
+                    <div key={book._id} className="mobile-card mobile-inventory-card">
+                      <div className="mobile-card-header">
+                        <div>
+                          <div className="mobile-card-title">{book.title}</div>
+                          <div className="mobile-card-subtitle">by {book.author}</div>
+                        </div>
+                        <div>
                           {isOutOfStock ? (
                             <span className="badge badge-out-of-stock">Out of Stock</span>
                           ) : isLowStock ? (
@@ -181,57 +257,69 @@ export default function Inventory({ onOpenStockModal, refreshTrigger, showToast 
                           ) : (
                             <span className="badge badge-in-stock">In Stock</span>
                           )}
-                        </td>
-                        <td>
-                          <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
+                        </div>
+                      </div>
+
+                      <div className="mobile-card-body">
+                        <div className="mobile-card-info-row">
+                          <span className="info-label">Category:</span>
+                          <span className="badge badge-category">{book.category}</span>
+                        </div>
+                        <div className="mobile-card-info-row">
+                          <span className="info-label">Unit Price:</span>
+                          <span className="info-value" style={{ fontWeight: 600 }}>${book.price.toFixed(2)}</span>
+                        </div>
+                        <div className="mobile-card-info-row">
+                          <span className="info-label">In Stock:</span>
+                          <span className="info-value" style={{ fontWeight: 700, fontSize: '1rem', color: isOutOfStock ? '#dc2626' : isLowStock ? '#d97706' : '#16a34a' }}>
+                            {book.quantity} units
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="mobile-card-actions">
+                        <div className="mobile-adjust-group">
+                          <span style={{ fontSize: '0.78rem', color: '#64748b', fontWeight: 600 }}>Adjust:</span>
+                          <div className="mobile-btn-pill-group">
                             <button
                               className="btn btn-outline btn-sm"
-                              title="Decrease quantity by 1"
                               disabled={book.quantity <= 0}
                               onClick={() => handleQuickAdjust(book, -1)}
                             >
-                              - 1
+                              -1
                             </button>
                             <button
                               className="btn btn-outline btn-sm"
-                              title="Increase quantity by 1"
                               onClick={() => handleQuickAdjust(book, 1)}
                             >
-                              + 1
+                              +1
                             </button>
                             <button
                               className="btn btn-outline btn-sm"
-                              title="Increase quantity by 5"
                               onClick={() => handleQuickAdjust(book, 5)}
                             >
-                              + 5
+                              +5
                             </button>
                           </div>
-                        </td>
-                        <td>
-                          <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
-                            <button
-                              className="btn btn-primary btn-sm"
-                              onClick={() => onOpenStockModal(book)}
-                            >
-                              Update Stock
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan="7" className="empty-state">
-                      <div className="empty-icon">📦</div>
-                      <p>No books match this inventory filter.</p>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                        </div>
+                        <button
+                          className="btn btn-primary btn-sm mobile-action-btn"
+                          onClick={() => onOpenStockModal(book)}
+                        >
+                          Update Stock
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-icon">📦</div>
+                  <p>No books match this inventory filter.</p>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
     </div>

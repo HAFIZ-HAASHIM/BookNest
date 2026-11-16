@@ -105,17 +105,17 @@ export default function Dashboard({ setActiveTab, onOpenAddBook, onOpenNewOrder 
         <div className="card-header">
           <span className="card-title">⚡ Quick Management Actions</span>
         </div>
-        <div className="card-body" style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
-          <button className="btn btn-primary" onClick={onOpenAddBook}>
+        <div className="card-body quick-actions-container">
+          <button className="btn btn-primary btn-action" onClick={onOpenAddBook}>
             + Add New Book
           </button>
-          <button className="btn btn-outline" onClick={onOpenNewOrder}>
+          <button className="btn btn-outline btn-action" onClick={onOpenNewOrder}>
             🛒 Create Customer Order
           </button>
-          <button className="btn btn-outline" onClick={() => setActiveTab('inventory')}>
+          <button className="btn btn-outline btn-action" onClick={() => setActiveTab('inventory')}>
             📦 View Inventory Alerts
           </button>
-          <button className="btn btn-outline" onClick={() => setActiveTab('sales')}>
+          <button className="btn btn-outline btn-action" onClick={() => setActiveTab('sales')}>
             📈 View Sales Report
           </button>
         </div>
@@ -131,10 +131,12 @@ export default function Dashboard({ setActiveTab, onOpenAddBook, onOpenNewOrder 
               className="btn btn-outline btn-sm"
               onClick={() => setActiveTab('orders')}
             >
-              View All Orders &rarr;
+              View All &rarr;
             </button>
           </div>
-          <div className="table-responsive">
+
+          {/* Desktop Table View */}
+          <div className="table-responsive desktop-only-view">
             <table className="custom-table">
               <thead>
                 <tr>
@@ -174,6 +176,29 @@ export default function Dashboard({ setActiveTab, onOpenAddBook, onOpenNewOrder 
               </tbody>
             </table>
           </div>
+
+          {/* Mobile Order Cards View */}
+          <div className="mobile-only-cards-view">
+            {stats?.recentOrders && stats.recentOrders.length > 0 ? (
+              stats.recentOrders.map((order) => (
+                <div key={order._id} className="mobile-order-card">
+                  <div className="mobile-order-header">
+                    <span className="mobile-order-customer">{order.customerName}</span>
+                    <span className="badge badge-order-completed">{order.status}</span>
+                  </div>
+                  <div className="mobile-order-book">{order.bookTitle}</div>
+                  <div className="mobile-order-footer">
+                    <span className="mobile-order-qty">Qty: <strong>{order.quantity}</strong></span>
+                    <span className="mobile-order-total">${order.totalPrice.toFixed(2)}</span>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <div className="empty-state" style={{ padding: '24px 12px' }}>
+                No orders placed yet.
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Stock & Category Overview */}
@@ -188,23 +213,23 @@ export default function Dashboard({ setActiveTab, onOpenAddBook, onOpenNewOrder 
             </button>
           </div>
           <div className="card-body">
-            <div style={{ marginBottom: '16px' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.88rem' }}>
-                <span>Out of Stock Titles:</span>
-                <span style={{ fontWeight: 700, color: stats?.outOfStockCount > 0 ? '#dc2626' : '#16a34a' }}>
-                  {stats?.outOfStockCount ?? 0}
+            <div className="inventory-summary-stats">
+              <div className="inv-stat-item">
+                <span className="inv-stat-label">Out of Stock:</span>
+                <span className="inv-stat-val" style={{ color: stats?.outOfStockCount > 0 ? '#dc2626' : '#16a34a' }}>
+                  {stats?.outOfStockCount ?? 0} titles
                 </span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px', fontSize: '0.88rem' }}>
-                <span>Low Stock Titles (&le; 5 units):</span>
-                <span style={{ fontWeight: 700, color: '#d97706' }}>
-                  {stats?.lowStockCount ?? 0}
+              <div className="inv-stat-item">
+                <span className="inv-stat-label">Low Stock (&le; 5 units):</span>
+                <span className="inv-stat-val" style={{ color: '#d97706' }}>
+                  {stats?.lowStockCount ?? 0} titles
                 </span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.88rem' }}>
-                <span>Total Units in Stock:</span>
-                <span style={{ fontWeight: 700, color: '#16a34a' }}>
-                  {stats?.totalStock ?? 0}
+              <div className="inv-stat-item">
+                <span className="inv-stat-label">Total Units in Stock:</span>
+                <span className="inv-stat-val" style={{ color: '#16a34a' }}>
+                  {stats?.totalStock ?? 0} units
                 </span>
               </div>
             </div>
@@ -214,22 +239,12 @@ export default function Dashboard({ setActiveTab, onOpenAddBook, onOpenNewOrder 
             <h4 style={{ fontSize: '0.86rem', fontWeight: 600, color: '#475569', marginBottom: '10px' }}>
               Categories in Catalog
             </h4>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className="category-list-container">
               {stats?.categoryStats && stats.categoryStats.length > 0 ? (
                 stats.categoryStats.slice(0, 5).map((cat) => (
-                  <div
-                    key={cat._id}
-                    style={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      fontSize: '0.84rem',
-                      padding: '4px 8px',
-                      backgroundColor: '#f8fafc',
-                      borderRadius: '4px',
-                    }}
-                  >
-                    <span>{cat._id}</span>
-                    <span style={{ color: '#64748b' }}>{cat.count} titles ({cat.stock} in stock)</span>
+                  <div key={cat._id} className="category-pill-row">
+                    <span className="cat-pill-name">{cat._id}</span>
+                    <span className="cat-pill-count">{cat.count} titles ({cat.stock} stock)</span>
                   </div>
                 ))
               ) : (

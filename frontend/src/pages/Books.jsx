@@ -139,98 +139,173 @@ export default function Books({
         {loading ? (
           <div className="loading-spinner">Loading book collection...</div>
         ) : (
-          <div className="table-responsive">
-            <table className="custom-table">
-              <thead>
-                <tr>
-                  <th>Title</th>
-                  <th>Author</th>
-                  <th>Category</th>
-                  <th>Price ($)</th>
-                  <th>Stock</th>
-                  <th>Status</th>
-                  <th style={{ textAlign: 'right' }}>Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {books.length > 0 ? (
-                  books.map((book) => {
-                    const isOutOfStock = book.quantity <= 0;
-                    const isLowStock = book.quantity > 0 && book.quantity <= 5;
+          <>
+            {/* Desktop Table View */}
+            <div className="table-responsive desktop-only-view">
+              <table className="custom-table">
+                <thead>
+                  <tr>
+                    <th>Title</th>
+                    <th>Author</th>
+                    <th>Category</th>
+                    <th>Price ($)</th>
+                    <th>Stock</th>
+                    <th>Status</th>
+                    <th style={{ textAlign: 'right' }}>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {books.length > 0 ? (
+                    books.map((book) => {
+                      const isOutOfStock = book.quantity <= 0;
+                      const isLowStock = book.quantity > 0 && book.quantity <= 5;
 
-                    return (
-                      <tr key={book._id}>
-                        <td>
-                          <div style={{ fontWeight: 600 }}>{book.title}</div>
-                        </td>
-                        <td style={{ color: '#475569' }}>{book.author}</td>
-                        <td>
-                          <span className="badge badge-category">{book.category}</span>
-                        </td>
-                        <td style={{ fontWeight: 600 }}>
-                          ${book.price.toFixed(2)}
-                        </td>
-                        <td>
-                          <span style={{ fontWeight: 600 }}>{book.quantity}</span> units
-                        </td>
-                        <td>
+                      return (
+                        <tr key={book._id}>
+                          <td>
+                            <div style={{ fontWeight: 600 }}>{book.title}</div>
+                          </td>
+                          <td style={{ color: '#475569' }}>{book.author}</td>
+                          <td>
+                            <span className="badge badge-category">{book.category}</span>
+                          </td>
+                          <td style={{ fontWeight: 600 }}>
+                            ${book.price.toFixed(2)}
+                          </td>
+                          <td>
+                            <span style={{ fontWeight: 600 }}>{book.quantity}</span> units
+                          </td>
+                          <td>
+                            {isOutOfStock ? (
+                              <span className="badge badge-out-of-stock">Out of Stock</span>
+                            ) : isLowStock ? (
+                              <span className="badge badge-low-stock">Low Stock</span>
+                            ) : (
+                              <span className="badge badge-in-stock">In Stock</span>
+                            )}
+                          </td>
+                          <td>
+                            <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
+                              <button
+                                className="btn btn-outline btn-sm"
+                                title="Quick stock update"
+                                onClick={() => onOpenStockModal(book)}
+                              >
+                                Stock
+                              </button>
+                              <button
+                                className="btn btn-outline btn-sm"
+                                title="Edit book details"
+                                onClick={() => onOpenEditBook(book)}
+                              >
+                                Edit
+                              </button>
+                              <button
+                                className="btn btn-danger btn-sm"
+                                title="Delete book from catalog"
+                                onClick={() => handleDelete(book)}
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  ) : (
+                    <tr>
+                      <td colSpan="7" className="empty-state">
+                        <div className="empty-icon">📖</div>
+                        <p>No books found matching your search.</p>
+                        <button
+                          className="btn btn-outline btn-sm"
+                          style={{ marginTop: '10px' }}
+                          onClick={() => {
+                            setSearch('');
+                            setCategory('All');
+                          }}
+                        >
+                          Clear Filters
+                        </button>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Mobile Book Cards View */}
+            <div className="mobile-only-cards-view">
+              {books.length > 0 ? (
+                books.map((book) => {
+                  const isOutOfStock = book.quantity <= 0;
+                  const isLowStock = book.quantity > 0 && book.quantity <= 5;
+
+                  return (
+                    <div key={book._id} className="mobile-book-card">
+                      <div className="mobile-book-header">
+                        <div>
+                          <div className="mobile-book-title">{book.title}</div>
+                          <div className="mobile-book-author">by {book.author}</div>
+                        </div>
+                        <span className="badge badge-category">{book.category}</span>
+                      </div>
+
+                      <div className="mobile-book-meta-row">
+                        <span className="mobile-book-price">${book.price.toFixed(2)}</span>
+                        <div>
+                          <span style={{ fontSize: '0.84rem', marginRight: '6px' }}>Stock: <strong>{book.quantity}</strong></span>
                           {isOutOfStock ? (
-                            <span className="badge badge-out-of-stock">Out of Stock</span>
+                            <span className="badge badge-out-of-stock">Out</span>
                           ) : isLowStock ? (
-                            <span className="badge badge-low-stock">Low Stock</span>
+                            <span className="badge badge-low-stock">Low</span>
                           ) : (
                             <span className="badge badge-in-stock">In Stock</span>
                           )}
-                        </td>
-                        <td>
-                          <div className="table-actions" style={{ justifyContent: 'flex-end' }}>
-                            <button
-                              className="btn btn-outline btn-sm"
-                              title="Quick stock update"
-                              onClick={() => onOpenStockModal(book)}
-                            >
-                              Stock
-                            </button>
-                            <button
-                              className="btn btn-outline btn-sm"
-                              title="Edit book details"
-                              onClick={() => onOpenEditBook(book)}
-                            >
-                              Edit
-                            </button>
-                            <button
-                              className="btn btn-danger btn-sm"
-                              title="Delete book from catalog"
-                              onClick={() => handleDelete(book)}
-                            >
-                              Delete
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                ) : (
-                  <tr>
-                    <td colSpan="7" className="empty-state">
-                      <div className="empty-icon">📖</div>
-                      <p>No books found matching your search.</p>
-                      <button
-                        className="btn btn-outline btn-sm"
-                        style={{ marginTop: '10px' }}
-                        onClick={() => {
-                          setSearch('');
-                          setCategory('All');
-                        }}
-                      >
-                        Clear Filters
-                      </button>
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
+                        </div>
+                      </div>
+
+                      <div className="mobile-book-actions">
+                        <button
+                          className="btn btn-outline btn-sm"
+                          onClick={() => onOpenStockModal(book)}
+                        >
+                          📦 Stock
+                        </button>
+                        <button
+                          className="btn btn-outline btn-sm"
+                          onClick={() => onOpenEditBook(book)}
+                        >
+                          ✏️ Edit
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleDelete(book)}
+                        >
+                          🗑️ Delete
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="empty-state">
+                  <div className="empty-icon">📖</div>
+                  <p>No books found matching your search.</p>
+                  <button
+                    className="btn btn-outline btn-sm"
+                    style={{ marginTop: '10px' }}
+                    onClick={() => {
+                      setSearch('');
+                      setCategory('All');
+                    }}
+                  >
+                    Clear Filters
+                  </button>
+                </div>
+              )}
+            </div>
+          </>
         )}
       </div>
     </div>

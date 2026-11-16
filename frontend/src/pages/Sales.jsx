@@ -107,64 +107,117 @@ export default function Sales({ refreshTrigger, showToast }) {
           {loading ? (
             <div className="loading-spinner">Loading sales calculations...</div>
           ) : (
-            <div className="table-responsive">
-              <table className="custom-table">
-                <thead>
-                  <tr>
-                    <th>Book Title</th>
-                    <th>Units Sold</th>
-                    <th>Total Revenue ($)</th>
-                    <th>% of Total Sales</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {bookSalesList.length > 0 ? (
-                    bookSalesList.map((item, idx) => {
-                      const percentage = totalSales > 0 ? ((item.revenue / totalSales) * 100).toFixed(1) : 0;
-                      return (
-                        <tr key={idx}>
-                          <td style={{ fontWeight: 600 }}>{item.title}</td>
-                          <td>
-                            <span style={{ fontWeight: 600 }}>{item.unitsSold}</span> units
-                          </td>
-                          <td style={{ fontWeight: 700, color: 'var(--primary)' }}>
-                            ${item.revenue.toFixed(2)}
-                          </td>
-                          <td>
-                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                              <span>{percentage}%</span>
-                              <div
-                                style={{
-                                  flex: 1,
-                                  height: '6px',
-                                  backgroundColor: '#e2e8f0',
-                                  borderRadius: '3px',
-                                  overflow: 'hidden',
-                                }}
-                              >
+            <>
+              {/* Desktop View */}
+              <div className="table-responsive desktop-only-view">
+                <table className="custom-table">
+                  <thead>
+                    <tr>
+                      <th>Book Title</th>
+                      <th>Units Sold</th>
+                      <th>Total Revenue ($)</th>
+                      <th>% of Total Sales</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {bookSalesList.length > 0 ? (
+                      bookSalesList.map((item, idx) => {
+                        const percentage = totalSales > 0 ? ((item.revenue / totalSales) * 100).toFixed(1) : 0;
+                        return (
+                          <tr key={idx}>
+                            <td style={{ fontWeight: 600 }}>{item.title}</td>
+                            <td>
+                              <span style={{ fontWeight: 600 }}>{item.unitsSold}</span> units
+                            </td>
+                            <td style={{ fontWeight: 700, color: 'var(--primary)' }}>
+                              ${item.revenue.toFixed(2)}
+                            </td>
+                            <td>
+                              <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                <span>{percentage}%</span>
                                 <div
                                   style={{
-                                    width: `${percentage}%`,
-                                    height: '100%',
-                                    backgroundColor: 'var(--primary)',
+                                    flex: 1,
+                                    height: '6px',
+                                    backgroundColor: '#e2e8f0',
+                                    borderRadius: '3px',
+                                    overflow: 'hidden',
                                   }}
-                                />
+                                >
+                                  <div
+                                    style={{
+                                      width: `${percentage}%`,
+                                      height: '100%',
+                                      backgroundColor: 'var(--primary)',
+                                    }}
+                                  />
+                                </div>
                               </div>
-                            </div>
-                          </td>
-                        </tr>
-                      );
-                    })
-                  ) : (
-                    <tr>
-                      <td colSpan="4" className="empty-state">
-                        No sales recorded yet.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+                            </td>
+                          </tr>
+                        );
+                      })
+                    ) : (
+                      <tr>
+                        <td colSpan="4" className="empty-state">
+                          No sales recorded yet.
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Mobile Cards View */}
+              <div className="mobile-only-cards-view">
+                {bookSalesList.length > 0 ? (
+                  bookSalesList.map((item, idx) => {
+                    const percentage = totalSales > 0 ? ((item.revenue / totalSales) * 100).toFixed(1) : 0;
+                    return (
+                      <div key={idx} className="mobile-card mobile-sales-card">
+                        <div className="mobile-card-header">
+                          <div className="mobile-card-title">{item.title}</div>
+                          <div style={{ fontWeight: 700, color: 'var(--primary)', fontSize: '1rem' }}>
+                            ${item.revenue.toFixed(2)}
+                          </div>
+                        </div>
+                        <div className="mobile-card-body">
+                          <div className="mobile-card-info-row">
+                            <span className="info-label">Units Sold:</span>
+                            <span className="info-value" style={{ fontWeight: 600 }}>{item.unitsSold} copies</span>
+                          </div>
+                          <div className="mobile-card-info-row">
+                            <span className="info-label">Share of Revenue:</span>
+                            <span className="info-value" style={{ fontWeight: 600 }}>{percentage}%</span>
+                          </div>
+                          <div
+                            style={{
+                              marginTop: '6px',
+                              height: '6px',
+                              backgroundColor: '#e2e8f0',
+                              borderRadius: '3px',
+                              overflow: 'hidden',
+                            }}
+                          >
+                            <div
+                              style={{
+                                width: `${percentage}%`,
+                                height: '100%',
+                                backgroundColor: 'var(--primary)',
+                              }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })
+                ) : (
+                  <div className="empty-state">
+                    <p>No sales recorded yet.</p>
+                  </div>
+                )}
+              </div>
+            </>
           )}
         </div>
 
